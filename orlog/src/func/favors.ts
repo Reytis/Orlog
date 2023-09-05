@@ -61,7 +61,9 @@ export function lokiTrick(level:number, targetDices: Dice[]) {
     switch (level) {
         case 1:
             spentPP = 3
-            bannedDice.push(targetDices[Math.floor(Math.random() * targetDices.length)])
+            let dice = dices.indexOf(dices[Math.floor(Math.random() * dices.length)])
+            bannedDice.push(dices[dice])
+            dices.splice(dice, 1)
             break;
         case 2:
             spentPP = 6
@@ -84,7 +86,8 @@ export function lokiTrick(level:number, targetDices: Dice[]) {
     }
     return {
         spentPP: spentPP,
-        diceToBan: bannedDice
+        diceToBan: bannedDice,
+        newDices: dices
     }
 }
 
@@ -408,7 +411,7 @@ export function brunhildFury(level:number, targetRes:Player) {
     }
 }
 
-export function baldrinvulnerability(level:number, targetRes:Player) {
+export function baldrInvulnerability(level:number, targetRes:Player) {
     let spentPP = 0
     let newRes:Player['lockRes'] = lockingRes(targetRes)
 
@@ -416,14 +419,17 @@ export function baldrinvulnerability(level:number, targetRes:Player) {
         case 1:
             spentPP = 3
             newRes!.helmet = newRes!.helmet * 2
+            newRes!.shield = newRes!.shield * 2
             break;
         case 2:
             spentPP = 6
             newRes!.helmet = newRes!.helmet * 3
+            newRes!.shield = newRes!.shield * 3
             break;
         case 3:
             spentPP = 9
             newRes!.helmet = newRes!.helmet * 4
+            newRes!.shield = newRes!.shield * 4
             break;   
         default:
             break;
