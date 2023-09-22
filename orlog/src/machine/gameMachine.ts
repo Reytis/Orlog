@@ -1,7 +1,7 @@
 import { createModel } from 'xstate/lib/model.js';
 import { GameContext, GameStates, Player } from '../types.ts';
 import { canChooseGuard, canFavorOneGuard, canFavorTwoGuard, canNextTurnGuard, canSelectGuard, canSetUpGuard, canStartGuard, canThrowGuard, canToResoluteGuard, canWinGuard } from './guards.ts';
-import { chooseFavorAction, pointResAction, selectDiceAction, setUpAction, startAction, throwDiceAction } from './actions.ts';
+import { chooseFavorAction, favorOneResAction, favorTwoResAction, nextTurnAction, pointResAction, resultResAction, selectDiceAction, setUpAction, startAction, throwDiceAction } from './actions.ts';
 import { InterpreterFrom, interpret } from 'xstate';
 
 export const GameModel = createModel({
@@ -76,13 +76,16 @@ export const GameMachine = GameModel.createMachine({
         },
         favorOneRes: {
           cond: canFavorOneGuard,
+          actions: [GameModel.assign(favorOneResAction)],
           target: GameStates.RESOLUTION
         },
         resultRes: {
+          actions: [GameModel.assign(resultResAction)],
           target: GameStates.RESOLUTION
         },
         favorTwoRes: {
           cond: canFavorTwoGuard,
+          actions: [GameModel.assign(favorTwoResAction)],
           target: GameStates.RESOLUTION
         },
         resolute: [{
@@ -90,6 +93,7 @@ export const GameMachine = GameModel.createMachine({
           target: GameStates.VICTORY
         },{
           cond: canNextTurnGuard,
+          actions: [GameModel.assign(nextTurnAction)],
           target: GameStates.TURN
         }]
       }

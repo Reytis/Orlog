@@ -5,8 +5,9 @@ export type Favor = {
   level: number | null,
   name: Gods,
   priority: number,
-  effect?: Function,
-  cost?: number[]
+  cost?: number[],
+  target?: string,
+  sacrifice?: number
 }
 export enum Gods {
   thrymr = 'thrymr',//1
@@ -54,14 +55,7 @@ export type Player = {
   character?: Character,
   favor?: Favor[],
   dices?: Dice[],
-  result: [
-    Dice | undefined,
-    Dice | undefined,
-    Dice | undefined,
-    Dice | undefined,
-    Dice | undefined,
-    Dice | undefined
-  ],
+  result: Dice[],
   lockRes?: {
     axe: number,
     helmet: number,
@@ -69,7 +63,7 @@ export type Player = {
     arrow: number,
     hand: number
   },
-  bannedDices?: number[],
+  bannedDices?: Dice[],
   additionalDices?: Dice[],
   spentPP?: number,
   stats: {

@@ -1,4 +1,4 @@
-import { lockingRes, pileOuFace, throwDice } from "../func/gameFunc.ts";
+import { damageDealt, favorOneApplication, favorTwoApplication, lockingRes, pileOuFace, throwDice } from "../func/gameFunc.ts";
 import { GameAction } from "../types.ts";
 
 export const setUpAction: GameAction<"setUpGame"> = (context, event) => ({
@@ -89,6 +89,7 @@ export const chooseFavorAction: GameAction<"chooseFavor"> = (context, event) => 
 export const pointResAction: GameAction<"pointRes"> = (context) => {
   const mainP = context.players.find(p => p.id === context.mainPlayer)!
   const otherP = context.players.find(p => p.id !== context.mainPlayer)!
+
   mainP.result.forEach(r => {
     if (r!.pp) {
       mainP.stats.pp.update++
@@ -106,9 +107,82 @@ export const pointResAction: GameAction<"pointRes"> = (context) => {
   }
 }
 
-export const favorOneResAction: GameAction<"favorOneRes"> = () => {
+export const favorOneResAction: GameAction<"favorOneRes"> = (context) => {
+  let mainP = context.players.find(p => p.id === context.mainPlayer)!
+  let otherP = context.players.find(p => p.id !== context.mainPlayer)!
+
+  mainP.stats.pp.update = 0
+  otherP.stats.pp.update = 0
+  mainP.stats.pv.update = 0
+  otherP.stats.pv.update = 0
+
+
+  mainP.lockRes = lockingRes(mainP)
+  otherP.lockRes = lockingRes(otherP)
+
+  let mainPlayerCall = favorOneApplication(mainP, otherP)
+  mainP = mainPlayerCall.player
+  otherP = mainPlayerCall.opponent
+
+  let otherPlayerCall = favorOneApplication(otherP, mainP)
+  mainP = otherPlayerCall.player
+  otherP = otherPlayerCall.opponent
 
   return {
-    players: []
+    players: [mainP, otherP]
+  }
+}
+
+export const resultResAction: GameAction<"resultRes"> = (context) => {
+  let mainP = context.players.find(p => p.id === context.mainPlayer)!
+  let otherP = context.players.find(p => p.id !== context.mainPlayer)!
+
+  mainP.stats.pp.update = 0
+  otherP.stats.pp.update = 0
+
+  mainP.stats.pv.current = mainP.stats.pv.current - damageDealt(mainP.lockRes, otherP.lockRes)
+  mainP.stats.pv.update = -damageDealt(mainP.lockRes, otherP.lockRes)
+  
+  otherP.stats.pv.current = otherP.stats.pv.current - damageDealt(otherP.lockRes, mainP.lockRes)
+  otherP.stats.pv.update = -damageDealt(otherP.lockRes, mainP.lockRes)
+
+  return {
+    players: [mainP, otherP]
+  }
+}
+
+export const favorTwoResAction: GameAction<"favorTwoRes"> = (context) => {
+  let mainP = context.players.find(p => p.id === context.mainPlayer)!
+  let otherP = context.players.find(p => p.id !== context.mainPlayer)!
+
+  mainP.stats.pp.update = 0
+  otherP.stats.pp.update = 0
+  mainP.stats.pv.update = 0
+  otherP.stats.pv.update = 0
+
+  let mainPlayerCall = favorTwoApplication(mainP, otherP)
+  mainP = mainPlayerCall.player
+  otherP = mainPlayerCall.opponent
+
+  let otherPlayerCall = favorTwoApplication(otherP, mainP)
+  mainP = otherPlayerCall.player
+  otherP = otherPlayerCall.opponent
+
+  return {
+    players: [mainP, otherP]
+  }
+}
+
+export const nextTurnAction: GameAction<"resolute"> = (context) => {
+  let mainP = context.players.find(p => p.id === context.mainPlayer)!
+  let otherP = context.players.find(p => p.id !== context.mainPlayer)!
+
+  mainP.stats.pp.update = 0
+  otherP.stats.pp.update = 0
+  mainP.stats.pv.update = 0
+  otherP.stats.pv.update = 0
+
+  return {
+    players: [mainP, otherP]
   }
 }

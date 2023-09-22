@@ -1,4 +1,5 @@
 import { Dice, Face, Player } from "../types.ts";
+import { baldrInvulnerability, bragiVerve, brunhildFury, freyjaPlenty, freyrGift, friggSight, heimdallWatch, helGrip, idunnRejuvenation, lokiTrick, mimirWisdom, odinSacrifice, skadiHunt, skuldClain, thorStrike, thrymrTheft, tyrPledge, ullrAim, varBond, vidarMight } from "./favors.ts";
 
 //Select Randomly the player who play first
 export function pileOuFace(arr:Player[]):Player["id"] {
@@ -19,18 +20,16 @@ export function throwDice():Dice {
 //Calculate the numbuer of each face in the player result 
 export function lockingRes(s: Player): Player['lockRes'] {
   let resultLock:Player["lockRes"]
-  if (s.lockRes !== undefined) {
-    resultLock = s.lockRes
-  } else {
-    resultLock = {
-      arrow: 0,
-      axe: 0,
-      hand: 0,
-      shield: 0,
-      helmet: 0,
-    }
+  resultLock = {
+    arrow: 0,
+    axe: 0,
+    hand: 0,
+    shield: 0,
+    helmet: 0,
   }
+
   let res = s.additionalDices ? [...s.result, ...s.additionalDices] : s.result
+
   res.forEach(r => {
     switch (r!.face) {
       case Face.axe:
@@ -52,6 +51,44 @@ export function lockingRes(s: Player): Player['lockRes'] {
         break;
     }
   })
+
+  let bannedDice = {
+    arrow: 0,
+    axe: 0,
+    hand: 0,
+    shield: 0,
+    helmet: 0,
+  }
+  if(s.bannedDices) {
+    s.bannedDices.forEach(r => {
+      switch (r!.face) {
+        case Face.axe:
+          bannedDice!.axe++
+          break;
+        case Face.helmet:
+          bannedDice!.helmet++
+          break;
+        case Face.bow:
+          bannedDice!.arrow++
+          break;
+        case Face.hand:
+          bannedDice!.hand++
+          break;
+        case Face.shield:
+          bannedDice!.shield++
+          break;
+        default:
+          break;
+      }
+    })    
+  }
+
+  resultLock.arrow = resultLock.arrow - bannedDice.arrow
+  resultLock.axe = resultLock.axe - bannedDice.axe
+  resultLock.hand = resultLock.hand - bannedDice.hand
+  resultLock.shield = resultLock.shield - bannedDice.shield
+  resultLock.helmet = resultLock.helmet - bannedDice.helmet
+
   return resultLock
 }
 
@@ -91,4 +128,273 @@ export function shieldDamageBlock(receiver: Player['lockRes'], dealer: Player['l
 
 export function damageBlock(receiver: Player['lockRes'], dealer: Player['lockRes']): number {
     return shieldDamageBlock(receiver, dealer) + helmetDamageBlock(receiver, dealer)
+}
+
+export function favorOneApplication(Caller: Player, Target: Player) {
+  let favor = Caller.selectedFavor!
+  let caller:Player = {...Caller}
+  let target:Player = {...Target}
+
+  if (!favor === undefined || favor.priority < 5) {
+    switch (favor.name) {
+      case 'thrymr':
+        let value
+
+        if (Target.selectedFavor) {
+          value = thrymrTheft(favor.level!, Target.selectedFavor,)
+        }
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP
+          target.selectedFavor = value.newTargetFavor
+        }
+        break;
+      case 'var':
+        if (Target.selectedFavor) {
+        value = varBond(favor.level!, Target.selectedFavor)
+        }
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP
+          caller.stats.pv.current = caller.stats.pv.current + value.healPV
+          caller.stats.pv.update = value.healPV
+        }
+        break;
+      case 'loki':
+        value = lokiTrick(favor.level!, Target.result)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP
+          target.bannedDices = value.diceToBan
+
+          target.lockRes = lockingRes(target)
+        }
+        break;
+      case 'freyja':
+
+        value = freyjaPlenty(favor.level!)
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP
+          caller.additionalDices = value.additionalDices
+
+          caller.lockRes = lockingRes(caller)
+        }
+        break;
+      case 'frigg':
+        value = friggSight(favor.level!, favor.target === 'self' ? Caller.result : Target.result)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP
+
+          favor.target === 'self' ?
+            caller.result = value.rerolledDices :
+            target.result = value.rerolledDices
+
+            caller.lockRes = lockingRes(caller)
+            target.lockRes = lockingRes(target)
+          }
+        break;
+      case 'tyr':
+        value = tyrPledge(favor.level!, favor.sacrifice!)
+
+        if (value && value.spentPP <= caller.stats.pp.current && caller.stats.pv.current > favor.sacrifice!) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP
+
+          caller.stats.pv.current = caller.stats.pv.current - favor.sacrifice!
+          caller.stats.pv.update = favor.sacrifice!
+
+          target.stats.pp.current > value.targetLostPP ?
+            target.stats.pp.current = target.stats.pp.current - value.targetLostPP :
+            target.stats.pp.current = 0 
+        }
+        break;
+      case 'skuld':
+        value = skuldClain(favor.level!, Caller, Target)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP
+
+          target.stats.pp.current > value.targetLostPP ?
+            target.stats.pp.current = target.stats.pp.current - value.targetLostPP :
+            target.stats.pp.current = 0 
+        }
+        break;
+      case 'freyr':
+        value = freyrGift(favor.level!, Caller, Target)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = value.PPToGift - value.spentPP 
+
+          caller.stats.pp.current = caller.stats.pp.current + value.PPToGift 
+        }
+        break;
+      case 'skadi':
+        value = skadiHunt(favor.level!, Caller, Target)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP 
+
+          caller.lockRes = lockingRes(Caller)
+          caller.lockRes!.arrow += value.arrowToAdd
+        }
+        break;
+      case 'mimir':
+        value = mimirWisdom(favor.level!, Caller, Target)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = value.ppToAdd - value.spentPP 
+
+          caller.stats.pp.current = caller.stats.pp.current + value.ppToAdd 
+        }
+        break;
+      case 'bragi':
+        value = bragiVerve(favor.level!, Caller, Target)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = value.ppToAdd - value.spentPP 
+
+          caller.stats.pp.current = caller.stats.pp.current + value.ppToAdd 
+        }
+        break;
+      case 'vidar':
+        value = vidarMight(favor.level!, Target)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP 
+
+          target.lockRes = value.newTargetLockRes
+        }
+        break;
+      case 'brunhild':
+        value = brunhildFury(favor.level!, Caller)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP 
+
+          caller.lockRes = value.newTargetLockRes
+        }
+        break;
+      case 'baldr':
+        value = baldrInvulnerability(favor.level!, Caller)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP 
+
+          caller.lockRes = value.newTargetLockRes
+        }
+        break;
+      case 'ullr':
+        value = ullrAim(favor.level!, Target)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP 
+
+          target.lockRes = value.newTargetLockRes
+        }
+        break;
+      case 'heimdall':
+        value = heimdallWatch(favor.level!, Caller, Target)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP 
+
+          caller.stats.pv.current += value.pvtoHeal
+          caller.stats.pv.update = value.pvtoHeal
+        }
+        break;
+      case 'hel':
+        value = helGrip(favor.level!, Caller, Target)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP 
+
+          caller.stats.pv.current += value.pvtoHeal
+          caller.stats.pv.update = value.pvtoHeal
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  return {
+    player: caller,
+    opponent: target
+  }
+}
+
+export function favorTwoApplication(Caller: Player, Target: Player) {
+  let favor = Caller.selectedFavor!
+  let caller:Player = {...Caller}
+  let target:Player = {...Target}
+
+  if (!favor === undefined || favor.priority < 5) {
+    switch (favor.name) {
+      case 'thor':
+        let value
+        value = thorStrike(favor.level!)
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP
+          target.stats.pv.current = target.stats.pv.current - value.dmgToDeal
+          target.stats.pv.update = -value.dmgToDeal  
+        }
+        break;
+      case 'odin':
+        value = odinSacrifice(favor.level!, favor.sacrifice!)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP + value.ppToAdd
+          caller.stats.pp.update = -value.spentPP + value.ppToAdd
+          caller.stats.pv.current = caller.stats.pv.current - value.pvSacrified
+          caller.stats.pv.update = -value.pvSacrified 
+        }
+        break;
+      case 'idunn':
+        value = idunnRejuvenation(favor.level!)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP
+          caller.stats.pv.current = caller.stats.pv.current - value.pvToHeal
+          caller.stats.pv.update = +value.pvToHeal
+        }
+        break;
+
+        value = helGrip(favor.level!, Caller, Target)
+
+        if (value && value.spentPP <= caller.stats.pp.current) {
+          caller.stats.pp.current = caller.stats.pp.current - value.spentPP
+          caller.stats.pp.update = -value.spentPP 
+
+          caller.stats.pv.current += value.pvtoHeal
+          caller.stats.pv.update = value.pvtoHeal
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  return {
+    player: caller,
+    opponent: target
+  }
 }

@@ -10,21 +10,21 @@ export const canStartGuard: GameGuard<"start"> = (context) => {
 
 export const canThrowGuard: GameGuard<"throwDices"> = (context, event) => {
   const player = context.players.find(p => p.id === event.playerId)!
-  return context.curentThrower === event.playerId && player.count < 3 && player.result.includes(undefined)
+  return context.curentThrower === event.playerId && player.count < 3 && player.result.length < 6
 }
 
 export const canSelectGuard: GameGuard<"selectDices"> = (context, event) => {
   const player = context.players.find(p => p.id === event.playerId)!
-  return context.curentThrower === event.playerId && player.result.includes(undefined)
+  return context.curentThrower === event.playerId && player.result.length < 6
 }
 
 export const canChooseGuard: GameGuard<"chooseFavor"> = (context, event) => {
   const player = context.players.find(p => p.id === event.playerId)!
-  return !player.isReady && !player.result.includes(undefined)
+  return !player.isReady && player.result.length === 6
 }
 
 export const canToResoluteGuard: GameGuard<"toResolute"> = (context) => {
-  return context.players.find(p => p.result.includes(undefined)) === undefined && context.players.find(p => !p.isReady) === undefined
+  return context.players.find(p => p.result.length != 6 && context.players.find(p => !p.isReady)) === undefined
 }
 
 export const canFavorOneGuard: GameGuard<"favorOneRes"> = (context) => {
