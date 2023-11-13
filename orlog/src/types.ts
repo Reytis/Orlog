@@ -7,7 +7,8 @@ export type Favor = {
   priority: number,
   cost?: number[],
   target?: string,
-  sacrifice?: number
+  sacrifice?: number,
+  description?: string
 }
 export enum Gods {
   thrymr = 'thrymr',//1
@@ -43,6 +44,12 @@ export enum Face {
   shield = 'shield',
   bow = 'bow',
   hand = 'hand',
+}
+export type PlayerObject = {
+  name: string,
+  character: string[],
+  favors: string[],
+  position: string
 }
 
 export enum Character {
@@ -82,11 +89,6 @@ export enum GameStates {
   VICTORY = 'VICTORY'
 }
 
-export type FavorFunc<Level extends Favor["level"] > = (
-  context: GameContext,
-  player: Player['id'],
-  Level: Level
-) => Partial<GameContext>
 export type GameContext = ContextFrom<typeof GameModel>
 export type GameEvents = EventFrom<typeof GameModel>
 export type GameEvent<T extends GameEvents["type"]> = GameEvents & {type: T}

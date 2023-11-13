@@ -120,13 +120,38 @@ export const favorOneResAction: GameAction<"favorOneRes"> = (context) => {
   mainP.lockRes = lockingRes(mainP)
   otherP.lockRes = lockingRes(otherP)
 
-  let mainPlayerCall = favorOneApplication(mainP, otherP)
-  mainP = mainPlayerCall.player
-  otherP = mainPlayerCall.opponent
+  if (mainP.selectedFavor && otherP.selectedFavor) {
 
-  let otherPlayerCall = favorOneApplication(otherP, mainP)
-  mainP = otherPlayerCall.player
-  otherP = otherPlayerCall.opponent
+    if (mainP.selectedFavor?.priority >= otherP.selectedFavor?.priority) {
+      let mainPlayerCall = favorOneApplication(mainP, otherP)
+      mainP = mainPlayerCall.player
+      otherP = mainPlayerCall.opponent
+  
+      let otherPlayerCall = favorOneApplication(otherP, mainP)
+      mainP = otherPlayerCall.player
+      otherP = otherPlayerCall.opponent
+    } else {
+      let otherPlayerCall = favorOneApplication(otherP, mainP)
+      mainP = otherPlayerCall.player
+      otherP = otherPlayerCall.opponent
+  
+      let mainPlayerCall = favorOneApplication(mainP, otherP)
+      mainP = mainPlayerCall.player
+      otherP = mainPlayerCall.opponent
+    }
+  } else if (mainP.selectedFavor && otherP.selectedFavor === undefined) {
+
+    let mainPlayerCall = favorOneApplication(mainP, otherP)
+    mainP = mainPlayerCall.player
+    otherP = mainPlayerCall.opponent
+    
+  } else if (mainP.selectedFavor === undefined && otherP.selectedFavor) {
+
+    let otherPlayerCall = favorOneApplication(otherP, mainP)
+    mainP = otherPlayerCall.player
+    otherP = otherPlayerCall.opponent
+
+  }
 
   return {
     players: [mainP, otherP]
@@ -160,13 +185,38 @@ export const favorTwoResAction: GameAction<"favorTwoRes"> = (context) => {
   mainP.stats.pv.update = 0
   otherP.stats.pv.update = 0
 
-  let mainPlayerCall = favorTwoApplication(mainP, otherP)
-  mainP = mainPlayerCall.player
-  otherP = mainPlayerCall.opponent
+  if (mainP.selectedFavor && otherP.selectedFavor) {
 
-  let otherPlayerCall = favorTwoApplication(otherP, mainP)
-  mainP = otherPlayerCall.player
-  otherP = otherPlayerCall.opponent
+    if (mainP.selectedFavor?.priority >= otherP.selectedFavor?.priority) {
+      let mainPlayerCall = favorTwoApplication(mainP, otherP)
+      mainP = mainPlayerCall.player
+      otherP = mainPlayerCall.opponent
+  
+      let otherPlayerCall = favorTwoApplication(otherP, mainP)
+      mainP = otherPlayerCall.player
+      otherP = otherPlayerCall.opponent
+    } else {
+      let otherPlayerCall = favorTwoApplication(otherP, mainP)
+      mainP = otherPlayerCall.player
+      otherP = otherPlayerCall.opponent
+  
+      let mainPlayerCall = favorTwoApplication(mainP, otherP)
+      mainP = mainPlayerCall.player
+      otherP = mainPlayerCall.opponent
+    }
+  } else if (mainP.selectedFavor && otherP.selectedFavor === undefined) {
+
+    let mainPlayerCall = favorTwoApplication(mainP, otherP)
+    mainP = mainPlayerCall.player
+    otherP = mainPlayerCall.opponent
+    
+  } else if (mainP.selectedFavor === undefined && otherP.selectedFavor) {
+
+    let otherPlayerCall = favorTwoApplication(otherP, mainP)
+    mainP = otherPlayerCall.player
+    otherP = otherPlayerCall.opponent
+
+  }
 
   return {
     players: [mainP, otherP]
@@ -182,7 +232,35 @@ export const nextTurnAction: GameAction<"resolute"> = (context) => {
   mainP.stats.pv.update = 0
   otherP.stats.pv.update = 0
 
+  mainP.selectedFavor = undefined
+  otherP.selectedFavor = undefined
+
+  mainP.lockRes = undefined
+  otherP.lockRes = undefined
+
+  mainP.spentPP = 0
+  mainP.additionalDices = undefined
+  mainP.bannedDices = undefined
+
+  otherP.spentPP = 0
+  otherP.additionalDices = undefined
+  otherP.bannedDices = undefined
+
+  mainP.isReady = false
+  otherP.isReady = false
+
+  mainP.count = 0
+  otherP.count = 0
+
+  mainP.dices = []
+  otherP.dices = []
+
+  mainP.result = []
+  otherP.result = []
+
   return {
-    players: [mainP, otherP]
+    players: [mainP, otherP],
+    curentThrower: otherP.id,
+    mainPlayer: otherP.id
   }
 }
