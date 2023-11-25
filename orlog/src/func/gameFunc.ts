@@ -245,6 +245,7 @@ export function favorOneApplication(Caller: Player, Target: Player) {
 
           caller.lockRes = lockingRes(Caller)
           caller.lockRes!.arrow += value.arrowToAdd
+          caller.bonus = value.bonus
         }
         break;
       case 'mimir':
@@ -275,6 +276,7 @@ export function favorOneApplication(Caller: Player, Target: Player) {
           caller.stats.pp.update = -value.spentPP 
 
           target.lockRes = value.newTargetLockRes
+          target.bonus = value.bonus
         }
         break;
       case 'brunhild':
@@ -285,6 +287,7 @@ export function favorOneApplication(Caller: Player, Target: Player) {
           caller.stats.pp.update = -value.spentPP 
 
           caller.lockRes = value.newTargetLockRes
+          caller.bonus = value.bonus
         }
         break;
       case 'baldr':
@@ -295,6 +298,7 @@ export function favorOneApplication(Caller: Player, Target: Player) {
           caller.stats.pp.update = -value.spentPP 
 
           caller.lockRes = value.newTargetLockRes
+          caller.bonus = value.bonus
         }
         break;
       case 'ullr':
@@ -305,6 +309,7 @@ export function favorOneApplication(Caller: Player, Target: Player) {
           caller.stats.pp.update = -value.spentPP 
 
           target.lockRes = value.newTargetLockRes
+          target.bonus = value.bonus
         }
         break;
       case 'heimdall':
@@ -397,4 +402,50 @@ export function favorTwoApplication(Caller: Player, Target: Player) {
     player: caller,
     opponent: target
   }
+}
+
+export function sortResultDices(face:Face, second:boolean) {
+  let n = 0
+  if (second) {
+    switch (face) {
+      case Face.axe:
+        n=3
+        break;
+      case Face.hand:
+        n=8
+        break;
+      case Face.helmet:
+        n=1
+        break;
+      case Face.bow:
+        n=4
+        break;
+      case Face.shield:
+        n=2
+        break;
+      default:
+        break;
+    }    
+  } else {
+    switch (face) {
+      case Face.axe:
+        n=1
+        break;
+      case Face.hand:
+        n=8
+        break;
+      case Face.helmet:
+        n=3
+        break;
+      case Face.bow:
+        n=2
+        break;
+      case Face.shield:
+        n=4
+        break;
+      default:
+        break;
+    }
+  }
+return n
 }

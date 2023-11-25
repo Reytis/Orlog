@@ -1,4 +1,4 @@
-import { Dice, Favor, Player } from "../types";
+import { Dice, Face, Favor, Player } from "../types";
 import { axeDamageDealt, damageBlock, damageDealt, lockingRes, throwDice } from "./gameFunc";
 
 export function thrymrTheft(level: number, targetFavor: Favor) {
@@ -273,6 +273,7 @@ export function freyrGift(level:number, playerDice:Player, targetDices:Player) {
 export function skadiHunt(level:number, playerDice:Player, targetDices:Player) {
     let spentPP = 0
     let arrowToAdd = 0
+    let bonus:Player["bonus"] = [{type: Face.bow, num: level, multiply: true}]
 
     let player = lockingRes(playerDice)
     let target = lockingRes(targetDices)
@@ -283,6 +284,7 @@ export function skadiHunt(level:number, playerDice:Player, targetDices:Player) {
         case 1:
             spentPP = 6
             arrowToAdd = arrow
+
             break;
         case 2:
             spentPP = 10
@@ -299,7 +301,8 @@ export function skadiHunt(level:number, playerDice:Player, targetDices:Player) {
 
     return {
         spentPP: spentPP,
-        arrowToAdd: arrowToAdd
+        arrowToAdd: arrowToAdd,
+        bonus: bonus
     }
 }
 
@@ -360,6 +363,7 @@ export function bragiVerve(level:number, player:Player, target:Player) {
 export function vidarMight(level:number, targetRes:Player) {
     let spentPP = 0
     let newRes:Player['lockRes'] = lockingRes(targetRes)
+    let bonus:Player["bonus"] = [{type: Face.helmet, num: -level*2, multiply: false}]
 
     switch (level) {
         case 1:
@@ -380,13 +384,15 @@ export function vidarMight(level:number, targetRes:Player) {
     
     return {
         spentPP: spentPP,
-        newTargetLockRes: newRes
+        newTargetLockRes: newRes,
+        bonus: bonus
     }
 }
 
 export function brunhildFury(level:number, targetRes:Player) {
     let spentPP = 0
     let newRes:Player['lockRes'] = lockingRes(targetRes)
+    let bonus:Player["bonus"] = [{type: Face.axe, num: level === 1 ? 1.5 : level, multiply: true}]
 
     switch (level) {
         case 1:
@@ -407,29 +413,37 @@ export function brunhildFury(level:number, targetRes:Player) {
     
     return {
         spentPP: spentPP,
-        newTargetLockRes: newRes
+        newTargetLockRes: newRes,
+        bonus: bonus
     }
 }
 
 export function baldrInvulnerability(level:number, targetRes:Player) {
     let spentPP = 0
     let newRes:Player['lockRes'] = lockingRes(targetRes)
+    let bonus:Player["bonus"] = [{type: Face.shield, num: 0, multiply: true},{type: Face.helmet, num: 0, multiply: true}]
 
     switch (level) {
         case 1:
             spentPP = 3
             newRes!.helmet = newRes!.helmet * 2
             newRes!.shield = newRes!.shield * 2
+            bonus[0].num = 2
+            bonus[1].num = 2
             break;
         case 2:
             spentPP = 6
             newRes!.helmet = newRes!.helmet * 3
             newRes!.shield = newRes!.shield * 3
+            bonus[0].num = 3
+            bonus[1].num = 3
             break;
         case 3:
             spentPP = 9
             newRes!.helmet = newRes!.helmet * 4
             newRes!.shield = newRes!.shield * 4
+            bonus[0].num = 4
+            bonus[1].num = 4
             break;   
         default:
             break;
@@ -437,26 +451,31 @@ export function baldrInvulnerability(level:number, targetRes:Player) {
     
     return {
         spentPP: spentPP,
-        newTargetLockRes: newRes
+        newTargetLockRes: newRes,
+        bonus: bonus
     }
 }
 
 export function ullrAim(level:number, targetRes:Player) {
     let spentPP = 0
     let newRes:Player['lockRes'] = lockingRes(targetRes)
+    let bonus:Player["bonus"] = [{type: Face.shield, num: 0, multiply: false}]
 
     switch (level) {
         case 1:
             spentPP = 2
             newRes!.shield - 2 <= 0 ? newRes!.shield = 0 : newRes!.shield = newRes!.shield - 2
+            bonus[0].num = -2
             break;
         case 2:
             spentPP = 4
             newRes!.shield - 4 <= 0 ? newRes!.shield = 0 : newRes!.shield = newRes!.shield - 3
+            bonus[0].num = -3
             break;
         case 3:
             spentPP = 6
             newRes!.shield - 6 <= 0 ? newRes!.shield = 0 : newRes!.shield = newRes!.shield - 6
+            bonus[0].num = -6
             break;   
         default:
             break;
@@ -464,7 +483,8 @@ export function ullrAim(level:number, targetRes:Player) {
     
     return {
         spentPP: spentPP,
-        newTargetLockRes: newRes
+        newTargetLockRes: newRes,
+        bonus: bonus
     }
 }
 

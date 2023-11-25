@@ -1,7 +1,7 @@
 import { createModel } from 'xstate/lib/model.js';
 import { GameContext, GameStates, Player } from '../types.ts';
-import { canChooseGuard, canFavorOneGuard, canFavorTwoGuard, canNextTurnGuard, canSelectGuard, canSetUpGuard, canStartGuard, canThrowGuard, canToResoluteGuard, canWinGuard } from './guards.ts';
-import { chooseFavorAction, favorOneResAction, favorTwoResAction, nextTurnAction, pointResAction, resultResAction, selectDiceAction, setUpAction, startAction, throwDiceAction } from './actions.ts';
+import { canChooseGuard, canFavorOneGuard, canFavorTwoGuard, canNextTurnGuard, canSelectDiceGuard, canSelectFavorGuard, canSelectGuard, canSetUpGuard, canStartGuard, canThrowGuard, canToResoluteGuard, canWinGuard } from './guards.ts';
+import { chooseDiceAction, chooseFavorAction, favorOneResAction, favorTwoResAction, leaveAction, nextTurnAction, pointResAction, restartAction, resultResAction, selectDiceAction, selectFavorAction, setUpAction, startAction, throwDiceAction } from './actions.ts';
 import { InterpreterFrom, interpret } from 'xstate';
 
 export const GameModel = createModel({
@@ -14,13 +14,15 @@ export const GameModel = createModel({
     setUpGame: (playerId: Player["id"], playerName: Player["name"], playerCharacter: Player["character"], playerFavor: Player["favor"], playerIsReady: Player["isReady"], playerCount: Player["count"], playerResult: Player["result"], playerStat: Player["stats"], playerDice: Player['dices']) => ({playerId, playerName, playerCharacter, playerFavor, playerIsReady, playerCount, playerResult, playerStat, playerDice}),
     throwDices: (playerId: Player["id"]) => ({playerId}),
     selectDices: (playerId: Player["id"]) => ({playerId}),
+    chooseDice: (playerId: Player["id"], dice:number) => ({playerId, dice}),
     chooseFavor: (playerId: Player["id"], selectedFavor: Player['selectedFavor']) => ({playerId, selectedFavor}),
+    selectFavor: (playerId: Player["id"], selectedFavor: number, level:number, sacrifice?: number) => ({playerId, selectedFavor, level, sacrifice}),
     toResolute: () => ({}),
     pointRes: () => ({}),
     favorOneRes: () => ({}),
     resultRes: () => ({}),
     favorTwoRes: () => ({}),
-    resolute: (playerId: Player["id"]) => ({playerId}),
+    resolute: () => ({}),
     restart: () => ({}),
     leave: () => ({})
   }
@@ -55,6 +57,16 @@ export const GameMachine = GameModel.createMachine({
         selectDices: {
           cond: canSelectGuard,
           actions: [GameModel.assign(selectDiceAction)],
+          target: GameStates.TURN
+        },
+        chooseDice: {
+          cond: canSelectDiceGuard,
+          actions: [GameModel.assign(chooseDiceAction)],
+          target: GameStates.TURN
+        },
+        selectFavor: {
+          cond: canSelectFavorGuard,
+          actions: [GameModel.assign(selectFavorAction)],
           target: GameStates.TURN
         },
         chooseFavor: {
@@ -101,9 +113,11 @@ export const GameMachine = GameModel.createMachine({
     [GameStates.VICTORY]: {
       on: {
         restart: {
+          actions: [GameModel.assign(restartAction)],
           target: GameStates.TURN
         },
         leave: {
+          actions: [GameModel.assign(leaveAction)],
           target: GameStates.LOBBY
         }
       }

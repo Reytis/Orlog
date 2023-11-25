@@ -56,13 +56,17 @@ export const selectDiceAction: GameAction<"selectDices"> = (context, event) => {
   } else {
     player.dices!.forEach(d => {
       if (d.selected) {
-        player.result[player.dices!.indexOf(d)] = d
+        player.result.push(d)
       }
     })
+    if (player.result.length === 6) {
+      player.count = 3
+    }
   }
 
+
   player.dices = undefined
-  const newCurrent = context.players.find(p => p.id != event.playerId)!.id
+  const newCurrent = context.players.find(p => p.id != event.playerId)!.result.length === 6 ? player.id : context.players.find(p => p.id != event.playerId)!.id
   const newPlayer = [
     context.players.find(p => p.id != event.playerId)!,
     player
@@ -70,6 +74,58 @@ export const selectDiceAction: GameAction<"selectDices"> = (context, event) => {
   return {
     players: newPlayer,
     curentThrower: newCurrent
+  }
+}
+
+export const chooseDiceAction:GameAction<"chooseDice"> = (context, event) => {
+  const player = context.players.find(p => p.id === event.playerId)! 
+  player.dices![event.dice].selected = player.dices![event.dice].selected ? false : true
+
+  const newPlayer = [
+    context.players.find(p => p.id !== event.playerId)!,
+    player
+  ]
+  return {
+    players: newPlayer
+  }
+}
+
+export const selectFavorAction:GameAction<"selectFavor"> = (context, event) => {
+  const player = context.players.find(p => p.id === event.playerId)!
+  
+  const updatedFavor = player.favor?.map((f, index) => {
+    if (f !== undefined && f.selected !== false) {
+      if (f.selected === true && index !== event.selectedFavor) {
+        return { ...f, selected: false, sacrifice: event.sacrifice };
+      } else if (f.selected === true && index === event.selectedFavor && f.level !== event.level) {
+        return { ...f, level: event.level, sacrifice: event.sacrifice}
+      }
+    }
+
+    if (index === event.selectedFavor) {
+      return {
+        ...f,
+        selected: !f.selected,
+        level: event.level,
+        sacrifice: event.sacrifice
+      };
+    }
+
+    return f;
+  });
+
+
+  const updatedPlayer = {
+    ...player,
+    favor: updatedFavor,
+  };
+
+  const updatedPlayers = context.players.map((p) =>
+    p.id === event.playerId ? updatedPlayer : p
+  );
+
+  return {
+    players: updatedPlayers
   }
 }
 
@@ -262,5 +318,61 @@ export const nextTurnAction: GameAction<"resolute"> = (context) => {
     players: [mainP, otherP],
     curentThrower: otherP.id,
     mainPlayer: otherP.id
+  }
+}
+
+export const restartAction: GameAction<"restart"> = (context) => {
+  let mainP = context.players.find(p => p.id === context.mainPlayer)!
+  let otherP = context.players.find(p => p.id !== context.mainPlayer)!
+
+  mainP.stats.pp.update = 0
+  otherP.stats.pp.update = 0
+  mainP.stats.pv.update = 0
+  otherP.stats.pv.update = 0
+
+  mainP.stats.pp.current = 0
+  otherP.stats.pp.current = 0
+  mainP.stats.pv.current = 15
+  otherP.stats.pv.current = 15
+
+  mainP.selectedFavor = undefined
+  otherP.selectedFavor = undefined
+
+  mainP.lockRes = undefined
+  otherP.lockRes = undefined
+
+  mainP.spentPP = 0
+  mainP.additionalDices = undefined
+  mainP.bannedDices = undefined
+
+  otherP.spentPP = 0
+  otherP.additionalDices = undefined
+  otherP.bannedDices = undefined
+
+  mainP.isReady = false
+  otherP.isReady = false
+
+  mainP.count = 0
+  otherP.count = 0
+
+  mainP.dices = []
+  otherP.dices = []
+
+  mainP.result = []
+  otherP.result = []
+
+  return {
+    players: [mainP, otherP],
+    curentThrower: otherP.id,
+    mainPlayer: otherP.id
+  }
+}
+
+export const leaveAction: GameAction<"leave"> = () => {
+
+  return {
+    players: [],
+    curentThrower: null,
+    mainPlayer: null
   }
 }

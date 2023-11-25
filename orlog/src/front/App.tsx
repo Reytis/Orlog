@@ -1,43 +1,24 @@
-import { Character, Favor, Gods, Player } from "../types"
-import { CreatePlayerForm } from "./components/CreatePlayerForm"
-import { Game } from "./components/Game"
-import { Menu } from "./components/Menu"
+import { Favor, GameStates, Gods} from "../types"
+import { CreatePlayerForm } from "./PAGES/CreatePlayerForm"
+import { Game } from "./PAGES/Game"
+import { useGame } from "./hooks/useGame"
 
 
 
-let FavorTest:Favor = {
+export const FavorTest:Favor = {
   level: null,
-  name: Gods.baldr,
-  priority: 4,
-  cost: [3, 5, 8],
-  description: "description of the favor you know something like this."
-}
-let PlayerTest:Player = {
-  id: "1",
-  name: "Test",
-  character: Character.eivorHomme,
-  favor: [FavorTest, FavorTest, FavorTest],
-  result: [],
-  stats: {
-    pv: {
-      current: 15,
-      update: 0
-    },
-    pp: {
-      current: 12,
-      update: 0
-    }
-  },
-  isReady: false,
-  count: 0
+  name: Gods.none,
+  priority: 0,
+  cost: undefined,
+  description: "no favors."
 }
 
 function App() {
+  const {state} = useGame()
   return (
     <>
-      <CreatePlayerForm />
-      {/* <Menu />
-      <Game players={[PlayerTest, PlayerTest]} /> */}
+      {state === GameStates.LOBBY && <CreatePlayerForm />}
+      {(state === GameStates.TURN || state === GameStates.RESOLUTION) && <Game />}
     </>
   )
 }

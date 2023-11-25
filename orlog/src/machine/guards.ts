@@ -17,10 +17,17 @@ export const canSelectGuard: GameGuard<"selectDices"> = (context, event) => {
   const player = context.players.find(p => p.id === event.playerId)!
   return context.curentThrower === event.playerId && player.result.length < 6
 }
+export const canSelectDiceGuard: GameGuard<"chooseDice"> = (context, event) => {
+  return context.curentThrower === event.playerId
+}
 
 export const canChooseGuard: GameGuard<"chooseFavor"> = (context, event) => {
   const player = context.players.find(p => p.id === event.playerId)!
   return !player.isReady && player.result.length === 6
+}
+export const canSelectFavorGuard: GameGuard<"selectFavor"> = (context, event) => {
+  const player = context.players.find(p => p.id === event.playerId)!
+  return !player.isReady && player.result.length === 6 && event.playerId === player.id
 }
 
 export const canToResoluteGuard: GameGuard<"toResolute"> = (context) => {

@@ -1,6 +1,9 @@
 import { ContextFrom, EventFrom } from "xstate"
 import { GameModel } from "./machine/gameMachine.ts"
 
+/*
+  GAME TYPES 
+*/
 export type Favor = {
   level: number | null,
   name: Gods,
@@ -8,53 +11,19 @@ export type Favor = {
   cost?: number[],
   target?: string,
   sacrifice?: number,
-  description?: string
+  description?: string,
+  selected?: boolean
 }
-export enum Gods {
-  thrymr = 'thrymr',//1
-  var = 'var',//1
-  loki = 'loki',//2
-  freyja = 'freyja',//2
-  frigg = 'frigg',//2
-  tyr = 'tyr',//3
-  skuld = 'skuld',//3
-  freyr = 'freyr',//4
-  skadi = 'skadi',//4
-  mimir = 'mimir',//4
-  bragi = 'bragi',//4
-  vidar = 'vidar',//4
-  brunhild = 'brunhild',//4
-  baldr = 'baldr',//4
-  ullr = 'ullr',//4
-  heimdall = 'heimdall',//4
-  hel = 'hel',//4
-  thor = 'thor', //6
-  odin = 'odin',//7
-  idunn = 'idunn'//7
-}
-
 export type Dice = {
   pp: boolean,
   face: Face,
   selected: boolean
+  banned?: boolean
 }
-export enum Face {
-  axe = 'axe',
-  helmet = 'helmet',
-  shield = 'shield',
-  bow = 'bow',
-  hand = 'hand',
-}
-export type PlayerObject = {
-  name: string,
-  character: string[],
-  favors: string[],
-  position: string
-}
-
-export enum Character {
-  eivorHomme= 'eivor-homme',
-  eivorFemme= 'eivor-femme'
+export type Bonus = {
+  num: number, 
+  type: Face, 
+  multiply:boolean
 }
 export type Player = {
   id: string,
@@ -79,15 +48,64 @@ export type Player = {
   },
   selectedFavor?: Favor,
   isReady: boolean,
-  count: number
+  count: number,
+  bonus?: Bonus[]
+}
+export type PlayerObject = {
+  name: string,
+  character: Character[],
+  favors: string[],
+  position: string
 }
 
+/*
+  GAME DATAS
+*/
+export enum Face {
+  axe = 'axe',
+  helmet = 'helmet',
+  shield = 'shield',
+  bow = 'bow',
+  hand = 'hand',
+}
+export enum Gods {
+  thrymr = 'thrymr',//1
+  var = 'var',//1
+  loki = 'loki',//2
+  freyja = 'freyja',//2
+  frigg = 'frigg',//2
+  tyr = 'tyr',//3  Sacrifice
+  skuld = 'skuld',//3
+  freyr = 'freyr',//4
+  skadi = 'skadi',//4  Bonus
+  mimir = 'mimir',//4
+  bragi = 'bragi',//4
+  vidar = 'vidar',//4  Bonus
+  brunhild = 'brunhild',//4  Bonus
+  baldr = 'baldr',//4  Bonus
+  ullr = 'ullr',//4  Bonus
+  heimdall = 'heimdall',//4
+  hel = 'hel',//4
+  thor = 'thor', //6
+  odin = 'odin',//7  Sacrifice
+  idunn = 'idunn',//7
+  none = 'undefined'//none
+}
+export enum Character {
+  eivorHomme= 'eivor-homme',
+  eivorFemme= 'eivor-femme'
+}
 export enum GameStates {
   LOBBY = 'LOBBY',
   TURN = 'TURN',
   RESOLUTION = 'RESOLUTION',
   VICTORY = 'VICTORY'
 }
+
+
+/*
+  GAME MACHINE
+*/
 
 export type GameContext = ContextFrom<typeof GameModel>
 export type GameEvents = EventFrom<typeof GameModel>
