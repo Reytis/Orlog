@@ -8,6 +8,7 @@ import { SetUpGame } from "./components/SetUpGame"
 
  export const FavorsList = [
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.thor,
         priority: 6,
@@ -17,6 +18,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Deal damage to the opponent after Resolution phase."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.hel,
         priority: 4,
@@ -26,6 +28,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Each AXE damage delt to the opponent heals you."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.vidar,
         priority: 4,
@@ -35,6 +38,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Remove HELMET from the opponent."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.heimdall,
         priority: 4,
@@ -44,6 +48,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Heal Health for each attack you block."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.skadi,
         priority: 4,
@@ -53,6 +58,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Add ARROW to each die that rolled ARROW."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.ullr,
         priority: 4,
@@ -62,6 +68,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Your ARROW ignore the opponent's SHIELD."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.baldr,
         priority: 4,
@@ -71,6 +78,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Add HELMET or SHIELD for each die that rolled HELMET or SHIELD."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.freyja,
         priority: 2,
@@ -80,6 +88,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Roll additional dice this round."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.freyr,
         priority: 4,
@@ -89,6 +98,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Add to the total of whichever face is in majority."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.idunn,
         priority: 7,
@@ -98,6 +108,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Heal Health after Resolution phase."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.brunhild,
         priority: 4,
@@ -107,6 +118,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Multiply AXE, rounded up."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.skuld,
         priority: 3,
@@ -116,6 +128,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Destroy opponent's PP for each die that rolled ARROW."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.frigg,
         priority: 2,
@@ -125,6 +138,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Reroll any of your or your opponent's dice."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.mimir,
         priority: 4,
@@ -134,6 +148,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Gain PP for each damage dealt to you this round."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.loki,
         priority: 2,
@@ -143,6 +158,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Ban opponent's dice for the round."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.bragi,
         priority: 4,
@@ -152,6 +168,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Gain PP for each die that rolled HAND."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.odin,
         priority: 7,
@@ -161,6 +178,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "After Resolution phase sacrifice any Health and Gain PP for each."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.var,
         priority: 1,
@@ -170,6 +188,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Each PP spent by your opponent heals you."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.thrymr,
         priority: 1,
@@ -179,6 +198,7 @@ import { SetUpGame } from "./components/SetUpGame"
         description: "Reduce the effect level of a God Favor invoked by the opponents this round."
     }} />,
     <FavorUi favor={{
+        selected: false,
         level: null,
         name: Gods.tyr,
         priority: 3,

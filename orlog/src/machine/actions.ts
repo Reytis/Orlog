@@ -1,4 +1,4 @@
-import { damageDealt, favorOneApplication, favorTwoApplication, lockingRes, pileOuFace, throwDice } from "../func/gameFunc.ts";
+import { damageDealt, favorOneApplication, favorTwoApplication, lockingRes, pileOuFace, ppTheft, throwDice } from "../func/gameFunc.ts";
 import { GameAction } from "../types.ts";
 
 export const setUpAction: GameAction<"setUpGame"> = (context, event) => ({
@@ -221,11 +221,18 @@ export const resultResAction: GameAction<"resultRes"> = (context) => {
   mainP.stats.pp.update = 0
   otherP.stats.pp.update = 0
 
+  mainP.lockRes = lockingRes(mainP)
+  otherP.lockRes = lockingRes(otherP)
+
   mainP.stats.pv.current = mainP.stats.pv.current - damageDealt(mainP.lockRes, otherP.lockRes)
   mainP.stats.pv.update = -damageDealt(mainP.lockRes, otherP.lockRes)
+  otherP.stats.pp.current = otherP.stats.pp.current - ppTheft(otherP.lockRes, mainP.lockRes)
+  otherP.stats.pp.update = ppTheft(otherP.lockRes, mainP.lockRes)
   
   otherP.stats.pv.current = otherP.stats.pv.current - damageDealt(otherP.lockRes, mainP.lockRes)
   otherP.stats.pv.update = -damageDealt(otherP.lockRes, mainP.lockRes)
+  mainP.stats.pp.current = mainP.stats.pp.current - ppTheft(mainP.lockRes, otherP.lockRes)
+  mainP.stats.pp.update = ppTheft(mainP.lockRes, otherP.lockRes)
 
   return {
     players: [mainP, otherP]
@@ -288,6 +295,9 @@ export const nextTurnAction: GameAction<"resolute"> = (context) => {
   mainP.stats.pv.update = 0
   otherP.stats.pv.update = 0
 
+  otherP.favor?.forEach(f => f !== undefined ? f.selected = false : f)
+  mainP.favor?.forEach(f => f !== undefined ? f.selected = false : f)
+
   mainP.selectedFavor = undefined
   otherP.selectedFavor = undefined
 
@@ -313,6 +323,9 @@ export const nextTurnAction: GameAction<"resolute"> = (context) => {
 
   mainP.result = []
   otherP.result = []
+
+  mainP.bonus = undefined
+  otherP.bonus = undefined
 
   return {
     players: [mainP, otherP],

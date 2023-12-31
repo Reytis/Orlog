@@ -12,7 +12,7 @@ export type Favor = {
   target?: string,
   sacrifice?: number,
   description?: string,
-  selected?: boolean
+  selected: boolean
 }
 export type Dice = {
   pp: boolean,

@@ -47,16 +47,20 @@ export const PlayerComponent:FunctionComponent<PlayerProps> = ({player, second, 
                 <div className="left">
                     <div className="player__data">
                         <h2>{name.toUpperCase()}</h2>
-                        <PlayerStat stats={MyPlayer!.stats} />
+                        <PlayerStat stats={MyPlayer!.stats} key={Date.now()*Number(MyPlayer!.id)}/>
                     </div>
                     <div className="player__actions">
-                        {MyPlayer!.additionalDices !== undefined && MyPlayer!.bonus !== undefined && <div><div className="player__favors_bonus">
-                            <Dice face={MyPlayer!.bonus!.type} />
-                            <p style={MyPlayer!.bonus !== undefined && MyPlayer!.bonus.num < 0 ? {color:"var(--Negative)"}:{color:"var(--Positive)"}}>{MyPlayer!.bonus!.num}</p>
-                        </div> 
+                        {MyPlayer!.bonus !== undefined && <div>
+                            {MyPlayer!.bonus.map(b => 
+                                <div className="player__favors_bonus" key={Math.random()}>
+                                    <Dice face={b.type} />
+                                    <p style={MyPlayer!.bonus !== undefined && b.num < 0 ? { color: "var(--Negative)" } : { color: "var(--Positive)" }}>{b.num}</p>
+                                </div>    
+                            )}    
+                        </div>}
+                        {MyPlayer!.additionalDices !== undefined &&  
                         <div className="player__favors_additionals_dices">
                             {MyPlayer!.additionalDices.map(d => <Dice face={d.face} pp={d.pp} />)}
-                        </div>
                         </div>}
                         {
                         state === GameStates.TURN && (curentThrower === id || context.players.find(p => p.id !== id)?.result.length === 6) && (MyPlayer!.count < 3) &&

@@ -168,10 +168,16 @@ button:disabled {
 .update {
   position: absolute;
   right: -10%;
+  opacity: 0;
+}
+
+.called {
+  position: absolute;
+  right: -10%;
+  opacity: 0;
   animation-name: StatAnim;
   animation-duration: 1s;
   animation-fill-mode: forwards;
-  animation-iteration-count: 1;
 }
 
 @keyframes StatAnim {
@@ -442,7 +448,8 @@ input[type="radio"]:checked::before {
   position: absolute;
   top: 45%;
   left: 50%;
-  transform: translate(-63.5%, -50%);
+  margin: 0;
+  transform: translate(-50%, -50%);
 }
 .game__infos {
   position: absolute;

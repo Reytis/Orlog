@@ -110,6 +110,10 @@ export function damageDealt(receiver: Player['lockRes'], dealer: Player['lockRes
   return axeDamageDealt(receiver, dealer) + arrowDamageDealt(receiver, dealer)
 }
 
+export function ppTheft(receiver: Player['lockRes'], dealer: Player['lockRes']):number {
+  return receiver!.hand - dealer!.hand
+}
+
 //Calculate the amount of damage blocked by the player based on Player['lockRes']
 export function helmetDamageBlock(receiver: Player['lockRes'], dealer: Player['lockRes']): number {
   let damageBlock = 0
@@ -136,9 +140,9 @@ export function favorOneApplication(Caller: Player, Target: Player) {
   let target:Player = {...Target}
 
   if (!favor === undefined || favor.priority < 5) {
+    let value
     switch (favor.name) {
       case 'thrymr':
-        let value
 
         if (Target.selectedFavor) {
           value = thrymrTheft(favor.level!, Target.selectedFavor,)
