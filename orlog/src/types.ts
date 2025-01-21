@@ -54,7 +54,7 @@ export type Player = {
 export type PlayerObject = {
   name: string,
   character: Character[],
-  favors: string[],
+  favors: Favor[],
   position: string
 }
 
@@ -118,3 +118,15 @@ export type GameAction<T extends GameEvents["type"]> = (
   context: GameContext,
   event: GameEvent<T>
 ) => Partial<GameContext>
+
+export enum subStates {
+  throw = "throw",
+  chooseDice = "chooseDice",
+  chooseFavor = "chooseFavor",
+  resolution = "resolution",
+  pointRes = "pointRes",
+  favorOneRes = "favorOneRes",
+  resultRes = "resultRes",
+  favorTwoRes = "favorTwoRes",
+  endResolution = "endResolution"
+}

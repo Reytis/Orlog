@@ -1,26 +1,48 @@
-import { FunctionComponent } from "react";
-import { GameStates, Player } from "../../../types";
+import { FunctionComponent, useEffect, useState } from "react";
+import { GameContext, GameEvents, GameStates, Player } from "../../../types";
 import { PlayerStat } from "./Stats";
 import { FavorUi } from "./Favor";
 import { Button } from "./Buttons";
 import { Dice} from "./Dice";
 import { subStates } from "../Game";
-import { useGame } from "../../hooks/useGame";
-import { sortResultDices } from "../../../func/gameFunc";
+import { isMyTurn, sortResultDices } from "../../../func/gameFunc";
 
 interface PlayerProps {
     player: Player,
     second?: boolean,
-    subState: [subStates, (state: subStates) => void]
+    subState: [subStates, (state: subStates) => void],
+    context: GameContext,
+    send: (event: GameEvents) => void
+    state: GameStates
 }
 
-export const PlayerComponent:FunctionComponent<PlayerProps> = ({player, second, subState}) => {
+export const PlayerComponent:FunctionComponent<PlayerProps> = ({player, second, subState, context, state, send}) => {
         const {name, character, id} = player 
-        const {context, state, send} = useGame()
         const {curentThrower, players} = context
-        const MyPlayer = players.find(p => p.id === id)
+        const [MyPlayer, setMyPlayer] = useState<Player | undefined>(undefined);
+        const noChooseFavorTime = [
+            subStates.resolution, 
+            subStates.pointRes, 
+            subStates.favorOneRes, 
+            subStates.favorTwoRes, 
+            subStates.resultRes
+        ]
+
+        useEffect(() => {
+            const foundPlayer = players.find(p => p.id === id);
+            setMyPlayer(foundPlayer); // Met à jour l'état MyPlayer
+
+            if (context.players.find(p => p.result.length < 6) === undefined && !noChooseFavorTime.includes(subState[0])) {
+                subState[1](subStates.chooseFavor); 
+            }
+        }, [context, players, id]); // Dépendances : context, players, et id du joueur
+
+        if (!MyPlayer) {
+            return <div>Chargement ...</div>; // ou afficher un état de chargement si nécessaire
+        }
 
         const handleClickAction = () => {
+            console.log(context.players.find(p => p.result.length < 6) === undefined && MyPlayer!.result.length === 6)
             switch (subState[0]) {
                 case subStates.throw:
                     send({type: "throwDices", playerId: id});
@@ -47,7 +69,8 @@ export const PlayerComponent:FunctionComponent<PlayerProps> = ({player, second, 
                 <div className="left">
                     <div className="player__data">
                         <h2>{name.toUpperCase()}</h2>
-                        <PlayerStat stats={MyPlayer!.stats} key={Date.now()*Number(MyPlayer!.id)}/>
+                        <PlayerStat stats={MyPlayer!.stats} key={`stat_${MyPlayer!.id}_${MyPlayer!.stats.pv.update}_${MyPlayer!.stats.pp.update}`} />
+
                     </div>
                     <div className="player__actions">
                         {MyPlayer!.bonus !== undefined && <div>
@@ -63,7 +86,7 @@ export const PlayerComponent:FunctionComponent<PlayerProps> = ({player, second, 
                             {MyPlayer!.additionalDices.map(d => <Dice face={d.face} pp={d.pp} />)}
                         </div>}
                         {
-                        state === GameStates.TURN && (curentThrower === id || context.players.find(p => p.id !== id)?.result.length === 6) && (MyPlayer!.count < 3) &&
+                        state === GameStates.TURN && (curentThrower === id || context.players.find(p => p.id !== id)?.result.length === 6) && (MyPlayer!.count < 3) && isMyTurn(curentThrower!) &&
                         <Button CtaType="cta-primary" onClick={handleClickAction}>
                             {subState?.[0] === subStates.throw ? "Throw dices" : "Validate"}
                         </Button>}
@@ -86,8 +109,8 @@ export const PlayerComponent:FunctionComponent<PlayerProps> = ({player, second, 
             </div>
             <div className="player__favors">
                 {state === GameStates.TURN ? 
-                MyPlayer!.favor?.map(f => f !== undefined ? <FavorUi favor={f} key={Math.random()} subState={subState[0]} selectable={subState[0] === subStates.chooseFavor} selected={{current: f.selected? true : false, level: f.level? f.level : 0}} id={id} favorIndex={MyPlayer!.favor!.indexOf(f)}/> : '') :
-                MyPlayer!.favor?.map(f => f !== undefined && f.selected === true ? <FavorUi favor={f} key={Math.random()} selectable={subState[0] === subStates.chooseFavor} subState={subState[0]} selected={{current: f.selected? true : false, level: f.level? f.level : 0}} id={id} favorIndex={MyPlayer!.favor!.indexOf(f)}/> : '')
+                MyPlayer!.favor?.map(f => f !== undefined && f!== null ? <FavorUi favor={f} key={Math.random()} subState={subState[0]} selectable={subState[0] === subStates.chooseFavor} selected={{current: f.selected? true : false, level: f.level? f.level : 0}} id={id} favorIndex={MyPlayer!.favor!.indexOf(f)}/> : '') :
+                MyPlayer!.favor?.map(f => f !== undefined && f!== null && f.selected === true ? <FavorUi favor={f} key={Math.random()} selectable={subState[0] === subStates.chooseFavor} subState={subState[0]} selected={{current: f.selected? true : false, level: f.level? f.level : 0}} id={id} favorIndex={MyPlayer!.favor!.indexOf(f)}/> : '')
                 }  
             </div> 
             <img src={"CharactersGame/"+character}  className="player__character"/>

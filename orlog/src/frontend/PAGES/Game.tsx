@@ -1,29 +1,25 @@
-import { FunctionComponent, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "./components/Buttons";
 import { PlayerComponent } from "./components/PlayerData";
-import { useGame } from "../hooks/useGame";
-import { Favor, GameStates } from "../../types";
+import { Favor, GameContext, GameEvents, GameStates, subStates } from "../../types";
 import { Menu } from "./components/Menu";
+import { getUserId } from "../../func/gameFunc";
 
 
-export enum subStates {
-    throw = "throw",
-    chooseDice = "chooseDice",
-    chooseFavor = "chooseFavor",
-    resolution = "resolution",
-    pointRes = "pointRes",
-    favorOneRes = "favorOneRes",
-    resultRes = "resultRes",
-    favorTwoRes = "favorTwoRes",
-    endResolution = "endResolution"
+type GameProps = {
+    playerOne: string,
+    playerTwo: string,
+    context: GameContext,
+    send: (event: GameEvents) => void,
+    sendWithValidations: (event: GameEvents, player: string) => void
+    state: GameStates,
+    subState: subStates,
+    setSubState: (state: subStates) => void
+
 }
+export const Game = ({playerOne, playerTwo, context, send, state, sendWithValidations, subState, setSubState}: GameProps) => {
 
-
-export const Game:FunctionComponent = () => {
-    const [subState, setSubState] = useState(subStates.throw)
-    const {context, send, state} = useGame()
-
-    const handleStep = () => {
+    const handleStep = (subState: subStates) => {
         let p
         switch (subState) {
             case subStates.throw:
@@ -62,7 +58,7 @@ export const Game:FunctionComponent = () => {
         const player = context.players.find((p) => p.id === id);
       
         if (player) {
-          const selectedFavor = player.favor?.find((f) => f !== undefined && f.selected === true);
+          const selectedFavor = player.favor?.find((f) => f !== undefined && f!== null && f.selected === true);
       
           return selectedFavor;
         }
@@ -101,14 +97,14 @@ export const Game:FunctionComponent = () => {
         setSubState(subStates.endResolution)
     }
     const handleToResolute = () => {
-        send({type: "chooseFavor", playerId:"1", selectedFavor: findFavor("1")});
-        send({type: "chooseFavor", playerId:"2", selectedFavor: findFavor("2")});
-        send({type: "toResolute"})
+        send({type: "chooseFavor", playerId:playerOne, selectedFavor: findFavor(context.players[0].id)});
+        send({type: "chooseFavor", playerId:playerTwo, selectedFavor: findFavor(context.players[1].id)});
+        sendWithValidations({type: "toResolute"}, getUserId())
         setSubState(subStates.resolution)
     }
 
     const handleResolute = () => {
-        send({type: "resolute"})
+        sendWithValidations({type: "resolute"}, getUserId())
         setSubState(subStates.throw)
     }
 
@@ -119,10 +115,23 @@ export const Game:FunctionComponent = () => {
     }, [subState])
 
     return <div className="game">
-        <p className="game__infos">{handleStep()}</p>
-        <PlayerComponent player={context.players.find(p => p.id === '1')!} subState={[subState, (sub) => setSubState(sub)]}/>
+        <p className="game__infos">{handleStep(subState)}</p>
+        <PlayerComponent 
+            player={context.players.find(p => p.id === playerOne)!}
+            subState={[subState, (sub) => setSubState(sub)]} 
+            context={context} 
+            send={send} 
+            state={state}        
+        />
         {(subState === subStates.chooseFavor || subState === subStates.endResolution) && <Button CtaType="cta" onClick={subState === subStates.endResolution ? handleResolute : handleToResolute} >{state === GameStates.TURN ? "Resolution" : "Next Turn"}</Button>}
-        <PlayerComponent player={context.players.find(p => p.id === '2')!} second={true} subState={[subState, (sub) => setSubState(sub)]}/>
-        {state === GameStates.VICTORY && <Menu />}
+        <PlayerComponent 
+            player={context.players.find(p => p.id === playerTwo)!}
+            second={true}
+            subState={[subState, (sub) => setSubState(sub)]}
+            context={context} 
+            send={send} 
+            state={state}      
+        />
+        {state === GameStates.VICTORY && <Menu context={context} send={send} sendWithValidations={sendWithValidations} />}
     </div>
 }

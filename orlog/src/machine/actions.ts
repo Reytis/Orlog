@@ -429,3 +429,16 @@ export const leaveAction: GameAction<"leave"> = () => {
     mainPlayer: null      // Clear the main player
   }
 }
+
+//Action to handle when a player want to change is deck in LOBBY
+export const dropPlayerAction: GameAction<"dropPlayer"> = (context, event) => {
+
+  const newPlayers = context.players.length === 1 ? 
+  [] : 
+  context.players.filter(p => p.id !== event.playerId)
+
+  console.log(newPlayers)
+  return {
+    players: newPlayers, // Return updated players
+  }
+}

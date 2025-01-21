@@ -1,12 +1,14 @@
-import { useState } from "react"
-import { Character, Gods, PlayerObject } from "../../types"
+import { useEffect, useState } from "react"
+import { Character, GameContext, GameEvents, Gods, Player, PlayerObject } from "../../types"
 import { Button } from "./components/Buttons"
 import { Carousel } from "./components/Carousel"
 import { FavorUi } from "./components/Favor"
 import { Input } from "./components/Input"
 import { SetUpGame } from "./components/SetUpGame"
+import { v4 as uuidv4 } from 'uuid';
+import { convertPlayerToPlayerObject, resetMyTurnId, setMyTurnId } from "../../func/gameFunc"
 
- export const FavorsList = [
+export const FavorsList = [
     <FavorUi favor={{
         selected: false,
         level: null,
@@ -214,13 +216,35 @@ const CharacterList = [
     <img src={"assets/character/eivor-homme.png"} className="character-list" alt="eivor-homme"/>,
     <img src={"assets/character/eivor-femme.png"} className="character-list" alt="eivor-femme"/>
 ]
-
-export const CreatePlayerForm = () => {
+type FormProps = {
+    isOnline: boolean,
+    onIdDefined: (id: string) => void
+    onIdDelete: (id: string) => void
+    context: GameContext,
+    send: (event: GameEvents) => void
+    sendWithValidations: (event: GameEvents, player: string) => void
+}
+export const CreatePlayerForm = ({isOnline, onIdDefined, onIdDelete, context, send, sendWithValidations}: FormProps) => {
     const [players, setPlayer] = useState<PlayerObject[]>([])
     const [selectedFavors, setSelectedFavors] = useState<string[]>([]);
     const [selectedCharacter, setSelectedCharacter] = useState<Character[]>([]);
     const [selectedName, setSelectedName] = useState<string>("")
-
+    
+    // Ajouter un état pour gérer les joueurs mis à jour
+    const [updatedPlayers, setUpdatedPlayers] = useState<PlayerObject[]>([]);
+    
+    // Effect to populate players from context.players
+    useEffect(() => {
+        if (context.players) {
+            // Convert each player to PlayerObject
+            context.players.forEach(p => onIdDefined(p.id))
+            
+            // Convertir chaque joueur en PlayerObject et mettre à jour l'état
+            const convertedPlayers = context.players.map((player: Player) => convertPlayerToPlayerObject(player));
+            setUpdatedPlayers(convertedPlayers);  // Mettre à jour l'état ici
+        }
+    }, [context.players]); // Re-run effect when context.players changes
+    
     const handleFavorChange = (selectedItems: string) => {
         if(selectedFavors.includes(selectedItems)) {
             setSelectedFavors(selectedFavors.filter((items) => items !== selectedItems))
@@ -240,41 +264,63 @@ export const CreatePlayerForm = () => {
         }
     }
     const handleSubmit = () => {
-        if (selectedName !== "" && players.length < 2) {
-            setPlayer([...players, {
-                    name: selectedName,
-                    character: selectedCharacter,
-                    favors: selectedFavors,
-                    position: new Date().toString()
-                }
-            ])            
+        const player:PlayerObject = {
+            name: selectedName,
+            character: selectedCharacter,
+            favors: [
+                FavorsList.find(f => f.props.favor.name === selectedFavors[0])?.props.favor,
+                FavorsList.find(f => f.props.favor.name === selectedFavors[1])?.props.favor,
+                FavorsList.find(f => f.props.favor.name === selectedFavors[2])?.props.favor
+            ],
+            position: uuidv4()
         }
+        const { name, character, favors, position} = player
+        send({type: 'setUpGame',  
+            playerId: position, 
+            playerName: name, 
+            playerCharacter: character[0],  
+            playerFavor: favors,
+            playerCount: 0,
+            playerResult: [],
+            playerIsReady: false,
+            playerStat: {
+                pv: {current: 15, update: 0},
+                pp: {current: 0, update: 0}
+            },
+            playerDice: undefined
+        })
+        setPlayer([...players, player])
+        setMyTurnId(position)
     }
+    
     const handleRemovePlayer = (selectedP: PlayerObject) => {
+        send({type: 'dropPlayer', playerId: selectedP.position})
+        onIdDelete(selectedP.position)
         setPlayer(players.filter(p => p.position !== selectedP.position))
+        resetMyTurnId(selectedP.position)
     }
-
+    
     return <div className="form__page">
     <div className="player__form" style={{width: players.length > 0 ? "70vw" : "100vw"}}>
-        <h1>Créez vos joueurs</h1>
-        <div className="form">
-            <div className="form__section name">
-                <p>Votre Pseudonyme</p>
-                <Input InputType={"text"} value={selectedName} onChange={setSelectedName}>Eivor</Input>
-            </div>
-            <div className="form__section favors">
-                <p>Choisissez vos faveurs <span className="form-span">3max (optionnel) scrollable</span></p>
-                <Carousel elements={FavorsList} type="checkbox" maxChoice={3} onChange={handleFavorChange} choiced={selectedFavors} players={players}/>
-            </div>
-            <div className="form__section character">
-                <p>Choisissez votre personnage <span className="form-span">(optionnel)</span></p>
-                <Carousel elements={CharacterList} type="checkbox" scrollable={false} maxChoice={1} onChange={handleCharacterChange} choiced={selectedCharacter}/>
-            </div>
-            <div className="form_button"><Button CtaType={"cta-primary"} onClick={handleSubmit} disabled={players.length === 2}>Ajouter le joueurs</Button></div>
-            <div className="blur_effect"></div>
-        </div>
-        
+    <h1>Créez vos joueurs</h1>
+    <div className="form">
+    <div className="form__section name">
+    <p>Votre Pseudonyme</p>
+    <Input InputType={"text"} value={selectedName} onChange={setSelectedName}>Eivor</Input>
     </div>
-    <SetUpGame value={players.length} players={players} onChange={handleRemovePlayer}/>
+    <div className="form__section favors">
+    <p>Choisissez vos faveurs <span className="form-span">3max (optionnel) scrollable</span></p>
+    <Carousel elements={FavorsList} type="checkbox" maxChoice={3} onChange={handleFavorChange} choiced={selectedFavors} players={players}/>
+    </div>
+    <div className="form__section character">
+    <p>Choisissez votre personnage <span className="form-span">(optionnel)</span></p>
+    <Carousel elements={CharacterList} type="checkbox" scrollable={false} maxChoice={1} onChange={handleCharacterChange} choiced={selectedCharacter}/>
+    </div>
+    <div className="form_button"><Button CtaType={"cta-primary"} onClick={handleSubmit} disabled={players.length === 2 || (isOnline && players.length === 1 || selectedName === "")}>Ajouter le joueurs</Button></div>
+    <div className="blur_effect"></div>
+    </div>
+    
+    </div>
+    <SetUpGame value={updatedPlayers.length} players={updatedPlayers} onChange={handleRemovePlayer} send={send} sendWithValidations={sendWithValidations} />
     </div>
 }

@@ -1,7 +1,7 @@
 import { createModel } from 'xstate/lib/model.js'; 
 import { GameContext, GameStates, Player } from '../types.ts'; 
-import { canChooseGuard, canFavorOneGuard, canFavorTwoGuard, canNextTurnGuard, canSelectDiceGuard, canSelectFavorGuard, canSelectGuard, canSetUpGuard, canStartGuard, canThrowGuard, canToResoluteGuard, canWinGuard } from './guards.ts'; 
-import { chooseDiceAction, chooseFavorAction, favorOneResAction, favorTwoResAction, leaveAction, nextTurnAction, pointResAction, restartAction, resultResAction, selectDiceAction, selectFavorAction, setUpAction, startAction, throwDiceAction } from './actions.ts'; 
+import { canChooseGuard, canDropGuard, canFavorOneGuard, canFavorTwoGuard, canNextTurnGuard, canSelectDiceGuard, canSelectFavorGuard, canSelectGuard, canSetUpGuard, canStartGuard, canThrowGuard, canToResoluteGuard, canWinGuard } from './guards.ts'; 
+import { chooseDiceAction, chooseFavorAction, dropPlayerAction, favorOneResAction, favorTwoResAction, leaveAction, nextTurnAction, pointResAction, restartAction, resultResAction, selectDiceAction, selectFavorAction, setUpAction, startAction, throwDiceAction } from './actions.ts'; 
 import { InterpreterFrom, interpret } from 'xstate';
 
 // Define a model for the game state, with context and events
@@ -17,6 +17,7 @@ export const GameModel = createModel({
     // Event to set up the game with player information
     setUpGame: (playerId: Player["id"], playerName: Player["name"], playerCharacter: Player["character"], playerFavor: Player["favor"], playerIsReady: Player["isReady"], playerCount: Player["count"], playerResult: Player["result"], playerStat: Player["stats"], playerDice: Player['dices']) => 
     ({ playerId, playerName, playerCharacter, playerFavor, playerIsReady, playerCount, playerResult, playerStat, playerDice }),
+    dropPlayer: (playerId: Player["id"]) => ({playerId}),
 
     // Player action events (e.g., throwing dice, selecting, etc.)
     throwDices: (playerId: Player["id"]) => ({ playerId }),
@@ -54,6 +55,11 @@ export const GameMachine = GameModel.createMachine({
         setUpGame: {
           cond: canSetUpGuard, // Condition for setting up the game
           actions: [GameModel.assign(setUpAction)], // Action to set up the game
+          target: GameStates.LOBBY // Remain in the lobby
+        },
+        dropPlayer: {
+          cond: canDropGuard, // Condition for drop player off the game
+          actions: [GameModel.assign(dropPlayerAction)], // Action drop player off the game
           target: GameStates.LOBBY // Remain in the lobby
         }
       }

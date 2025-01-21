@@ -1,62 +1,83 @@
-import { type FunctionComponent, type PropsWithChildren, useEffect, useRef } from "react"
-import { Player } from "../../../types"
+import { FunctionComponent, PropsWithChildren, useEffect, useRef } from "react";
+import { Player } from "../../../types";
 
 type StatProps = PropsWithChildren<{
-  stats:Player["stats"]
-}>
+  stats: Player["stats"];
+}>;
 
-export const PlayerStat: FunctionComponent<StatProps> = ({stats}) => {
-    const ref = useRef<HTMLParagraphElement | null>(null)
-    const refTwo = useRef<HTMLParagraphElement | null>(null)
+export const PlayerStat: FunctionComponent<StatProps> = ({ stats }) => {
+  const refPV = useRef<HTMLParagraphElement | null>(null);
+  const refPP = useRef<HTMLParagraphElement | null>(null);
 
-    useEffect(() => {
-        const paragraphPV = ref.current
-        const paragraphPP = refTwo.current
+  useEffect(() => {
+    const paragraphPV = refPV.current;
+    const paragraphPP = refPP.current;
 
-        if (paragraphPV && stats.pv.update !== 0) {
-            paragraphPV?.classList.add('called')
+    if (paragraphPV && stats.pv.update !== 0) {
+      // Add animation class
+      paragraphPV.classList.add("called");
 
-            const timeout = setTimeout(()=>{
-                paragraphPV?.classList.remove('called')
-            }, 1000)
+      // Remove animation class after the duration
+      const timeoutPV = setTimeout(() => {
+        paragraphPV.classList.remove("called");
+      }, 1000); // Duration of the animation
 
-            return () => clearTimeout(timeout)
-        }
-        if (paragraphPP && stats.pp.update !== 0) {
-            paragraphPP?.classList.add('called')
+      // Cleanup function
+      return () => clearTimeout(timeoutPV);
+    }
 
-            const timeout = setTimeout(()=>{
-                paragraphPV?.classList.remove('called')
-                paragraphPP?.classList.remove('called')
-            }, 1000)
+    if (paragraphPP && stats.pp.update !== 0) {
+      // Add animation class
+      paragraphPP.classList.add("called");
 
-            return () => clearTimeout(timeout)
-        }
+      // Remove animation class after the duration
+      const timeoutPP = setTimeout(() => {
+        paragraphPP.classList.remove("called");
+      }, 1000); // Duration of the animation
 
-    }, [stats])
+      // Cleanup function
+      return () => clearTimeout(timeoutPP);
+    }
+  }, [stats.pv.update, stats.pp.update]); // Depend on the specific updates (PV or PP)
 
-    return (
-        <div className="stat">
-            <div className="pv">
-                <img src="assets/PV.png" width="60px"/>
-                <p className="stat_text">
-                    {stats.pv.current}
-                    Pv
-                </p>
-                <p ref={ref} className="update" style={stats.pv.update >= 0 ? {color: "var(--Positive)", top: "-25%"} : {color: "var(--Negative)", top: "30%"}}>
-                    {stats.pv.update >= 0 ? "+" + stats.pv.update : stats.pv.update}Pp
-                </p>
-            </div>
-            <div className="pp">
-                <img src="assets/PP.png" width="60px"/>
-                <p className="stat_text">
-                    {stats.pp.current}
-                    Pp
-                </p>
-                <p ref={refTwo} className="update" style={stats.pp.update >= 0 ? {color: "var(--Positive)", top: "-25%"} : {color: "var(--Negative)", top: "30%"}}>
-                    {stats.pp.update >= 0 ? "+" + stats.pp.update : stats.pp.update}Pp
-                </p>
-            </div>
-        </div>
-    )
-}
+  return (
+    <div className="stat">
+      <div className="pv">
+        <img src="assets/PV.png" width="60px" alt="pv icon" />
+        <p className="stat_text">
+          {stats.pv.current}
+          Pv
+        </p>
+        <p
+          ref={refPV}
+          className="update"
+          style={
+            stats.pv.update >= 0
+              ? { color: "var(--Positive)", top: "-25%" }
+              : { color: "var(--Negative)", top: "30%" }
+          }
+        >
+          {stats.pv.update >= 0 ? "+" + stats.pv.update : stats.pv.update}Pv
+        </p>
+      </div>
+      <div className="pp">
+        <img src="assets/PP.png" width="60px" alt="pp icon" />
+        <p className="stat_text">
+          {stats.pp.current}
+          Pp
+        </p>
+        <p
+          ref={refPP}
+          className="update"
+          style={
+            stats.pp.update >= 0
+              ? { color: "var(--Positive)", top: "-25%" }
+              : { color: "var(--Negative)", top: "30%" }
+          }
+        >
+          {stats.pp.update >= 0 ? "+" + stats.pp.update : stats.pp.update}Pp
+        </p>
+      </div>
+    </div>
+  );
+};

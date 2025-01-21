@@ -1,5 +1,7 @@
-import { Dice, Face, Player } from "../types.ts";
+import { subStates } from "../frontend/PAGES/Game.tsx";
+import { Dice, Face, Player, PlayerObject } from "../types.ts";
 import { baldrInvulnerability, bragiVerve, brunhildFury, freyjaPlenty, freyrGift, friggSight, heimdallWatch, helGrip, idunnRejuvenation, lokiTrick, mimirWisdom, odinSacrifice, skadiHunt, skuldClain, thorStrike, thrymrTheft, tyrPledge, ullrAim, varBond, vidarMight } from "./favors.ts";
+import { v4 as uuidv4 } from "uuid";
 
 //Select Randomly the player who play first
 export function pileOuFace(arr:Player[]):Player["id"] {
@@ -121,7 +123,7 @@ export function damageDealt(receiver: Player['lockRes'], dealer: Player['lockRes
 
 //Calculate the amount of PP stole 
 export function ppTheft(receiver: Player['lockRes'], dealer: Player['lockRes']):number {
-  return receiver!.hand - dealer!.hand
+  return dealer!.hand - receiver!.hand
 }
 
 //Calculate the amount of damage blocked by the player based on Player['lockRes']
@@ -401,8 +403,8 @@ export function favorOneApplication(Caller: Player, Target: Player) {
         caller.stats.pp.update = -value.spentPP 
         
         // Heal the caller by adding to their current health (PV)
-        caller.stats.pv.current += value.pvtoHeal
-        caller.stats.pv.update = value.pvtoHeal
+        caller.stats.pv.current += value.pvToHeal
+        caller.stats.pv.update = value.pvToHeal
       }
       break;
       
@@ -417,8 +419,8 @@ export function favorOneApplication(Caller: Player, Target: Player) {
         caller.stats.pp.update = -value.spentPP 
         
         // Heal the caller by adding to their current health (PV)
-        caller.stats.pv.current += value.pvtoHeal
-        caller.stats.pv.update = value.pvtoHeal
+        caller.stats.pv.current += value.pvToHeal
+        caller.stats.pv.update = value.pvToHeal
       }
       break;
       
@@ -537,4 +539,38 @@ export function sortResultDices(face: Face, second: boolean) {
   }
   // Return the numeric value for sorting
   return n
+}
+
+// Function to convert Player to PlayerObject
+export function convertPlayerToPlayerObject(player: Player): PlayerObject {
+  return {
+    name: player.name,
+    character: player.character ? [player.character] : [], // Assuming character is an optional single object, convert it to an array
+    favors: player.favor || [], // Favors can be an array or empty if undefined
+    position: player.id, // Set position to player's id
+  };
+}
+
+// utils to create or get unique id for game session
+export const getUserId = () => {
+  let userId = localStorage.getItem('userId');
+  if (!userId) {
+    userId = uuidv4(); // Generate unique id
+    localStorage.setItem('userId', userId!);
+  }
+  return userId;
+}
+
+export const isMyTurn = (id: string) => {
+  return localStorage.getItem('myTurnId') === id;
+}
+
+export const setMyTurnId = (id: string) => {
+  localStorage.setItem('myTurnId', id);
+}
+
+export const resetMyTurnId = (id: string) => {
+  if (isMyTurn(id)) {
+    localStorage.removeItem('myTurnId')
+  }
 }

@@ -61,3 +61,8 @@ export const canNextTurnGuard: GameGuard<"resolute"> = (context) => {
   //Check if the game is ready to go next turn
   return context.players.find(p => p.stats.pv.current <= 0) === undefined
 }
+
+export const canDropGuard: GameGuard<"dropPlayer"> = (context) => {
+  //Check if the player can be dropped
+  return context.players.length > 0
+}

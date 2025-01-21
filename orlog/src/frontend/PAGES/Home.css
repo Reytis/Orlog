@@ -1,0 +1,23 @@
+.Home {
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    background: url('assets/BG_Index.jpg') center/cover no-repeat;
+}
+
+.Home h1 {
+    margin: 48px;
+}
+.Home p {
+    margin: 24px;
+}
+
+.ctas {
+    display: flex;
+    justify-content: space-evenly;
+}

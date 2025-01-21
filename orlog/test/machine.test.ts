@@ -42,7 +42,16 @@ describe("machine", () => {
         id: '1',
         name: 'Marco',
         character: undefined,
-        favor: [{level: null, name: Gods.baldr, priority: 3}, {level: null, name: Gods.vidar, priority: 3}, {level: null, name: Gods.var, priority: 3}],
+        favor: [{
+          level: null, name: Gods.baldr, priority: 3,
+          selected: false
+        }, {
+          level: null, name: Gods.vidar, priority: 3,
+          selected: false
+        }, {
+          level: null, name: Gods.var, priority: 3,
+          selected: false
+        }],
         dices:  undefined,
         result: [],
         stats: {
@@ -146,7 +155,7 @@ describe("machine", () => {
     })
 
     it('should select the favor set her to the player an set the player ready', () => {
-      expect(machine.send(GameModel.events.chooseFavor('1', { level: 2, name: Gods.baldr, priority: 4})).changed).toBe(true)
+      expect(machine.send(GameModel.events.chooseFavor('1', { level: 2, name: Gods.baldr, priority: 4, selected: false})).changed).toBe(true)
       expect(machine.state.context.players.find(p => p.id === '1')!.isReady).toBe(true)
       expect(machine.state.context.players.find(p => p.id === '1')!.selectedFavor != undefined).toBe(true)
     })
@@ -158,7 +167,16 @@ describe("machine", () => {
         id: '1',
         name: 'Marco',
         character: undefined,
-        favor: [{level: null, name: Gods.baldr, priority: 3}, {level: null, name: Gods.vidar, priority: 3}, {level: null, name: Gods.var, priority: 3}],
+        favor: [{
+          level: null, name: Gods.baldr, priority: 3,
+          selected: false
+        }, {
+          level: null, name: Gods.vidar, priority: 3,
+          selected: false
+        }, {
+          level: null, name: Gods.var, priority: 3,
+          selected: false
+        }],
         dices:  undefined,
         result: [
           {
@@ -196,7 +214,7 @@ describe("machine", () => {
           pv: {current:15, update:0},
           pp: {current:20, update:0}
         },
-        selectedFavor: {level: 2, name: Gods.vidar, priority: 3},
+        selectedFavor: {level: 2, name: Gods.vidar, priority: 3, selected: true},
         isReady: false,
         count: 2
       },{

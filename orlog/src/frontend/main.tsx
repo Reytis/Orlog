@@ -8,7 +8,7 @@ import { GameContextProvider } from './hooks/useGame.tsx'
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <GameContextProvider>
-      <App />  
+      <App />       
     </GameContextProvider>
   </React.StrictMode>,
 )
