@@ -14,10 +14,10 @@ type GameProps = {
     sendWithValidations: (event: GameEvents, player: string) => void
     state: GameStates,
     subState: subStates,
-    setSubState: (state: subStates) => void
-
+    setSubState: (state: subStates) => void,
+    isOnline: boolean
 }
-export const Game = ({playerOne, playerTwo, context, send, state, sendWithValidations, subState, setSubState}: GameProps) => {
+export const Game = ({playerOne, playerTwo, context, send, state, sendWithValidations, subState, setSubState, isOnline}: GameProps) => {
 
     const handleStep = (subState: subStates) => {
         let p
@@ -121,7 +121,8 @@ export const Game = ({playerOne, playerTwo, context, send, state, sendWithValida
             subState={[subState, (sub) => setSubState(sub)]} 
             context={context} 
             send={send} 
-            state={state}        
+            state={state}
+            isOnline={isOnline}        
         />
         {(subState === subStates.chooseFavor || subState === subStates.endResolution) && <Button CtaType="cta" onClick={subState === subStates.endResolution ? handleResolute : handleToResolute} >{state === GameStates.TURN ? "Resolution" : "Next Turn"}</Button>}
         <PlayerComponent 
@@ -130,7 +131,8 @@ export const Game = ({playerOne, playerTwo, context, send, state, sendWithValida
             subState={[subState, (sub) => setSubState(sub)]}
             context={context} 
             send={send} 
-            state={state}      
+            state={state}
+            isOnline={isOnline}      
         />
         {state === GameStates.VICTORY && <Menu context={context} send={send} sendWithValidations={sendWithValidations} />}
     </div>

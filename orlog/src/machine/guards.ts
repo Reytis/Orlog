@@ -1,4 +1,4 @@
-import { GameGuard } from "../types.ts";
+import { GameGuard } from "../types";
 
 export const canSetUpGuard: GameGuard<"setUpGame"> = (context, event) => {
   //Check if user can add player to game based on playerlist and ID

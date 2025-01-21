@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES6",                        // Génère du code compatible avec ES6
+    "module": "ES6",                        // Utilise la syntaxe de module ESM
+    "outDir": "./dist",                     // Dossier de sortie pour les fichiers compilés
+    "rootDir": "../",                       // Dossier racine pour les fichiers sources
+    "strict": true,                         // Active les vérifications strictes
+    "esModuleInterop": true,                // Facilite l'import des modules CommonJS dans ESM
+    "moduleResolution": "node",             // Utilise la résolution des modules Node.js
+    "resolveJsonModule": true,              // Permet d'importer des fichiers JSON
+    "skipLibCheck": true,                   // Ignore les vérifications des types des dépendances
+    "allowSyntheticDefaultImports": true,    // Permet l'utilisation de `import` avec des modules CJS
+  },
+  "include": [
+    "./**/*.ts",                            // Inclut tous les fichiers TypeScript dans le backend
+    "../orlog/src/**/*.ts"                  // Inclut également les fichiers TypeScript du frontend
+  ],
+  "exclude": [
+    "node_modules",                         // Exclut le dossier `node_modules`
+    "dist"                                  // Exclut le dossier de sortie
+  ]
+}

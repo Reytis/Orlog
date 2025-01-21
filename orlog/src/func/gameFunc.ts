@@ -1,6 +1,5 @@
-import { subStates } from "../frontend/PAGES/Game.tsx";
-import { Dice, Face, Player, PlayerObject } from "../types.ts";
-import { baldrInvulnerability, bragiVerve, brunhildFury, freyjaPlenty, freyrGift, friggSight, heimdallWatch, helGrip, idunnRejuvenation, lokiTrick, mimirWisdom, odinSacrifice, skadiHunt, skuldClain, thorStrike, thrymrTheft, tyrPledge, ullrAim, varBond, vidarMight } from "./favors.ts";
+import { Dice, Face, Player, PlayerObject } from "../types";
+import { baldrInvulnerability, bragiVerve, brunhildFury, freyjaPlenty, freyrGift, friggSight, heimdallWatch, helGrip, idunnRejuvenation, lokiTrick, mimirWisdom, odinSacrifice, skadiHunt, skuldClain, thorStrike, thrymrTheft, tyrPledge, ullrAim, varBond, vidarMight } from "./favors";
 import { v4 as uuidv4 } from "uuid";
 
 //Select Randomly the player who play first

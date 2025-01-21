@@ -141,7 +141,8 @@ function App() {
           sendWithValidations={sendWithValidations}
           state={state} 
           subState={subState!} 
-          setSubState={setSubState}  
+          setSubState={setSubState}
+          isOnline={isOnline}  
         />
       )}        
       </>

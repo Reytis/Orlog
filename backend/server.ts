@@ -3,9 +3,8 @@ import http from 'http';
 import { Server } from 'socket.io'; 
 import cors from 'cors';
 import { v4 as uuidv4 } from 'uuid'; // Pour générer des IDs aléatoires
-import { interpret } from 'xstate';
-import { GameMachine } from '../src/machine/gameMachine.ts';
-import { subStates } from '../src/types.ts';
+import { makeGame } from '../orlog/src/machine/gameMachine';
+import { subStates } from '../orlog/src/types';
 
 const app = express();
 const server = http.createServer(app);
@@ -58,10 +57,10 @@ io.on('connection', (socket) => {
   socket.on('createPrivateGame', () => {
     console.log('Créer une partie privée demandée');
     const roomId = uuidv4(); // Générer une nouvelle ID de salle
-    const gameService = interpret(GameMachine).start(); // Créer la machine à état pour la salle
-    
+    const gameService = makeGame(); // Créer la machine à état pour la salle
+
     gameRooms[roomId] = { players: [], gameState: gameService, playerReady: [], subState: subStates.throw }; // Initialiser la salle
-    
+
     socket.join(roomId); // Ajouter le socket au salon
     console.log(`Partie privée créée : ${roomId}`);
     socket.emit('privateGameCreated', roomId); // Envoyer l'ID de la salle au créateur

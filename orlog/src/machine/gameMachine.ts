@@ -1,7 +1,7 @@
 import { createModel } from 'xstate/lib/model.js'; 
-import { GameContext, GameStates, Player } from '../types.ts'; 
-import { canChooseGuard, canDropGuard, canFavorOneGuard, canFavorTwoGuard, canNextTurnGuard, canSelectDiceGuard, canSelectFavorGuard, canSelectGuard, canSetUpGuard, canStartGuard, canThrowGuard, canToResoluteGuard, canWinGuard } from './guards.ts'; 
-import { chooseDiceAction, chooseFavorAction, dropPlayerAction, favorOneResAction, favorTwoResAction, leaveAction, nextTurnAction, pointResAction, restartAction, resultResAction, selectDiceAction, selectFavorAction, setUpAction, startAction, throwDiceAction } from './actions.ts'; 
+import { GameContext, GameStates, Player } from '../types'; 
+import { canChooseGuard, canDropGuard, canFavorOneGuard, canFavorTwoGuard, canNextTurnGuard, canSelectDiceGuard, canSelectFavorGuard, canSelectGuard, canSetUpGuard, canStartGuard, canThrowGuard, canToResoluteGuard, canWinGuard } from './guards'; 
+import { chooseDiceAction, chooseFavorAction, dropPlayerAction, favorOneResAction, favorTwoResAction, leaveAction, nextTurnAction, pointResAction, restartAction, resultResAction, selectDiceAction, selectFavorAction, setUpAction, startAction, throwDiceAction } from './actions'; 
 import { InterpreterFrom, interpret } from 'xstate';
 
 // Define a model for the game state, with context and events

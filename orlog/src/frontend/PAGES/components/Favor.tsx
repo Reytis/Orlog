@@ -2,7 +2,7 @@ import { useState, type FunctionComponent, type PropsWithChildren } from "react"
 import { Favor, GameStates, Player } from "../../../types"
 import { useGame } from "../../hooks/useGame"
 import { Input } from "./Input"
-import { subStates } from "../Game"
+import { subStates } from "../../../types"
 
 
 type FavorProps = PropsWithChildren<{

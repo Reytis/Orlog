@@ -1,5 +1,5 @@
 import { ContextFrom, EventFrom } from "xstate"
-import { GameModel } from "./machine/gameMachine.ts"
+import { GameModel } from "./machine/gameMachine"
 
 /*
   GAME TYPES 

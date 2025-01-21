@@ -1,5 +1,5 @@
-import { Dice, Face, Favor, Player } from "../types.ts";
-import { axeDamageDealt, damageBlock, damageDealt, lockingRes, throwDice } from "./gameFunc.ts";
+import { Dice, Face, Favor, Player } from "../types";
+import { axeDamageDealt, damageBlock, damageDealt, lockingRes, throwDice } from "./gameFunc";
 
 // Function to handle Thrymr's theft, which reduces the level of a target's favor
 export function thrymrTheft(level: number, targetFavor: Favor) {

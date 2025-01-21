@@ -4,7 +4,7 @@ import { PlayerStat } from "./Stats";
 import { FavorUi } from "./Favor";
 import { Button } from "./Buttons";
 import { Dice} from "./Dice";
-import { subStates } from "../Game";
+import { subStates } from "../../../types";
 import { isMyTurn, sortResultDices } from "../../../func/gameFunc";
 
 interface PlayerProps {
@@ -12,11 +12,12 @@ interface PlayerProps {
     second?: boolean,
     subState: [subStates, (state: subStates) => void],
     context: GameContext,
-    send: (event: GameEvents) => void
-    state: GameStates
+    send: (event: GameEvents) => void,
+    state: GameStates,
+    isOnline: boolean
 }
 
-export const PlayerComponent:FunctionComponent<PlayerProps> = ({player, second, subState, context, state, send}) => {
+export const PlayerComponent:FunctionComponent<PlayerProps> = ({player, second, subState, context, state, send, isOnline}) => {
         const {name, character, id} = player 
         const {curentThrower, players} = context
         const [MyPlayer, setMyPlayer] = useState<Player | undefined>(undefined);
@@ -86,7 +87,11 @@ export const PlayerComponent:FunctionComponent<PlayerProps> = ({player, second, 
                             {MyPlayer!.additionalDices.map(d => <Dice face={d.face} pp={d.pp} />)}
                         </div>}
                         {
-                        state === GameStates.TURN && (curentThrower === id || context.players.find(p => p.id !== id)?.result.length === 6) && (MyPlayer!.count < 3) && isMyTurn(curentThrower!) &&
+                        state === GameStates.TURN && 
+                        (curentThrower === id || context.players.find(p => p.id !== id)?.result.length === 6) && 
+                        (MyPlayer!.count < 3) && 
+                        (isMyTurn(curentThrower!) || !isOnline) &&
+                        
                         <Button CtaType="cta-primary" onClick={handleClickAction}>
                             {subState?.[0] === subStates.throw ? "Throw dices" : "Validate"}
                         </Button>}

@@ -1,6 +1,6 @@
 // Importing necessary game functions and types from other files
-import { damageDealt, favorOneApplication, favorTwoApplication, lockingRes, pileOuFace, ppTheft, throwDice } from "../func/gameFunc.ts";
-import { GameAction } from "../types.ts";
+import { damageDealt, favorOneApplication, favorTwoApplication, lockingRes, pileOuFace, ppTheft, throwDice } from "../func/gameFunc";
+import { GameAction } from "../types";
 
 // Action to set up a player in the game
 export const setUpAction: GameAction<"setUpGame"> = (context, event) => ({
