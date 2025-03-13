@@ -321,6 +321,6 @@ export const CreatePlayerForm = ({isOnline, onIdDefined, onIdDelete, context, se
     </div>
     
     </div>
-    <SetUpGame value={updatedPlayers.length} players={updatedPlayers} onChange={handleRemovePlayer} send={send} sendWithValidations={sendWithValidations} />
+    <SetUpGame value={updatedPlayers.length} players={updatedPlayers} onChange={handleRemovePlayer} sendWithValidations={sendWithValidations} />
     </div>
 }

@@ -8,11 +8,10 @@ type SetUpGameProps = PropsWithChildren<{
     value: number,
     players: PlayerObject[],
     onChange: Function,
-    send: (event: GameEvents) => void
     sendWithValidations: (event: GameEvents, player: string) => void
 }>
 
-export const SetUpGame:FunctionComponent<SetUpGameProps> = ({value, players, onChange, send, sendWithValidations}) => {
+export const SetUpGame:FunctionComponent<SetUpGameProps> = ({value, players, onChange, sendWithValidations}) => {
     
     const startGame = () => sendWithValidations({type: 'start'}, getUserId());
     const handleClick = () => {

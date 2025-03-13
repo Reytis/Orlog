@@ -20,7 +20,7 @@ function App() {
   
   // Utilisation de useOnlineGame si le jeu est en ligne
   const { state: onlineState, send: sendOnline, socket, context: onlineContext, sendWithValidations: sendWithValidation, subState: onlineSubState, requestSubStateChange: onlineSetSubState  } = useOnlineGame(roomId);
-  
+
   useEffect(() => {
     console.log("usedEffect", socket)
     if (socket) {
@@ -130,7 +130,7 @@ function App() {
         sendWithValidations={sendWithValidations} 
         /> 
       )}
-      
+      {isSocketConnected}
       
       {!isHome && (state === GameStates.TURN || state === GameStates.RESOLUTION) && (
         <Game 

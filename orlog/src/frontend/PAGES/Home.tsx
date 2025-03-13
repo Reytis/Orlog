@@ -17,7 +17,7 @@ export function Home({onClickSolo, onClickMulti, onClickPrivate}: HomeProps) {
 
         <div className="ctas">
             <Button CtaType="cta" disabled onClick={onClickMulti}> Jouer en ligne </Button>
-            <Button CtaType="cta" onClick={onClickPrivate}> Crée une partie privé </Button>
+            <Button CtaType="cta" disabled onClick={onClickPrivate}> Crée une partie privé </Button>
             <Button CtaType="cta" onClick={onClickSolo}> Jouer en local </Button>
         </div>  
     </div>
