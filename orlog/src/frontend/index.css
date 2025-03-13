@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Signika:wght@300;400&display=swap');
 @font-face {
   font-family: "Assassins";
-  src: url('assets/font/Assassin$.ttf') format("truetype");
+  src: url('font/Assassin$.ttf') format("truetype");
 }
 * { 
   font-family: 'Signika';
@@ -34,7 +34,7 @@ body {
   height: 100vh;
   display: flex;
   overflow: hidden;
-  background: center / cover url('assets/BG.png') var(--BG);
+  background: center / cover url('BG.png') var(--BG);
 }
 #root {
   display: flex;

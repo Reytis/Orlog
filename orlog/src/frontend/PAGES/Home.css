@@ -7,7 +7,7 @@
     flex-direction: column;
     justify-content: center;
 
-    background: url('assets/BG_Index.jpg') center/cover no-repeat;
+    background: url('BG_Index.jpg') center/cover no-repeat;
 }
 
 .Home h1 {
